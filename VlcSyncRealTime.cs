@@ -1,4 +1,4 @@
-﻿using SharpHook.Reactive;
+using SharpHook.Reactive;
 using Firebase.Database;
 using Firebase.Database.Query;
 using Firebase.Database.Streaming;
@@ -87,10 +87,10 @@ class VlcLauncher
     private static void SetupGlobalHook()
     {
         hook.KeyPressed
-            .Where(e => e.Data.KeyCode == SharpHook.Native.KeyCode.VcF9)
+            .Where(e => e.Data.KeyCode == SharpHook.Native.KeyCode.VcY)
             .Subscribe(async e =>
             {
-                Console.WriteLine("F9 was pressed");
+                Console.WriteLine("Y was pressed");
 
                 // Send VLC play/pause toggle or trigger sync logic
                 VlcState currentState = await GetCurrentVlcState();
@@ -162,17 +162,12 @@ class VlcLauncher
             if (state.isPlaying && !isPlaying)
             {
                 Console.WriteLine("Playing");
-                string timeStr = await SendVlcCommand("get_time");
-                int.TryParse(timeStr.Trim(), out int currentTime);
-                double expectedTime = state.currentTime;
 
                 await SendVlcCommand("pause"); // toggles play/pause state
 
-                if (Math.Abs(currentTime - expectedTime) > 2)
-                {
-                    Console.WriteLine($"Seeking to {expectedTime}");
-                    await SendVlcCommand($"seek {Math.Floor(expectedTime)}");
-                }
+                double expectedTime = state.currentTime;
+                Console.WriteLine($"Seeking to {expectedTime}");
+                await SendVlcCommand($"seek {Math.Floor(expectedTime)}");
                 isPlaying = state.isPlaying;
             }
             else if (!state.isPlaying && isPlaying)
